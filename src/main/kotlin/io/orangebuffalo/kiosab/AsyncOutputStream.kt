@@ -11,7 +11,7 @@ import kotlin.collections.ArrayList
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
 
-fun outputStreamAsyncProducer(
+fun asyncOutputStreamWriter(
     config: AsyncOutputStreamConfig = AsyncOutputStreamConfig(),
     spec: suspend AsyncOutputStreamContext.() -> Unit
 ): Flow<ByteBuffer> {
@@ -19,7 +19,7 @@ fun outputStreamAsyncProducer(
         val context = AsyncOutputStreamContext(config, this::emit)
         currentCoroutineContext()[StreamContext]?.context = context
         context.spec()
-        context.flush()
+        context.close()
     }.flowOn(StreamContext())
 }
 
@@ -34,7 +34,7 @@ data class AsyncOutputStreamConfig(
 )
 
 class AsyncOutputStreamContext(
-    config : AsyncOutputStreamConfig,
+    config: AsyncOutputStreamConfig,
     private val emit: suspend (ByteBuffer) -> Unit
 ) {
     private val outputStreamInternal = AsyncOutputStream(config.emitOnBytes)
@@ -47,9 +47,9 @@ class AsyncOutputStreamContext(
         outputStreamInternal.emitAllFlushedBuffers(emit)
     }
 
-    suspend fun flush() {
+    suspend fun close() {
         @Suppress("BlockingMethodInNonBlockingContext")
-        outputStreamInternal.flush()
+        outputStreamInternal.close()
         outputStreamInternal.emitAllFlushedBuffers(emit)
     }
 
@@ -88,8 +88,10 @@ class AsyncOutputStreamContext(
         }
 
         override fun close() {
-            flush()
-            closed = true
+            if (!closed) {
+                flush()
+                closed = true
+            }
         }
 
         override fun flush() {

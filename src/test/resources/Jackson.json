@@ -1,0 +1,43 @@
+{
+  "stringArray" : [ "one", "two" ],
+  "42" : [ 1, 2 ],
+  "nested" : { },
+  "nested2" : { },
+  "intArray" : [ 3, 4 ],
+  "doubleArray" : [ 5.0, 6.0 ],
+  "binary" : "Bwg=",
+  "binaryVar" : "CQo=",
+  "binaryArray" : "Cww=",
+  "byteArray" : "DQ4=",
+  "boolean0" : true,
+  "boolean" : false,
+  "embedded" : null,
+  "null0" : null,
+  "nullField" : null,
+  "int0" : 15,
+  "long0" : 16,
+  "double0" : 17.0,
+  "bigDecimal0" : 18,
+  "doubleInteger0" : 19,
+  "stringNumber0" : 20,
+  "float0" : 21.0,
+  "charArrayNumber" : 22,
+  "short0" : 23,
+  "int" : 24,
+  "long" : 25,
+  "double" : 26.0,
+  "float" : 27.0,
+  "bigInt" : 28,
+  "bigDecimal" : 29,
+  "short" : 30,
+  "objectField" : { },
+  "pojo0" : {
+    "value" : "value"
+  },
+  "longArray" : [ 3, 4 ],
+  "anotherArray" : [ ],
+  "arrayField" : [ ],
+  "pojo" : {
+    "value" : "value2"
+  }
+}

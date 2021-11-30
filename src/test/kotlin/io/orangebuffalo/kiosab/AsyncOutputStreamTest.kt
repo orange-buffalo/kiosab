@@ -15,7 +15,7 @@ import java.nio.ByteBuffer
 class AsyncOutputStreamTest : FunSpec({
 
     test("should not emit any buffers if nothing is written") {
-        val collectedBuffers = outputStreamAsyncProducer {
+        val collectedBuffers = asyncOutputStreamWriter {
             // no op
         }.toList()
 
@@ -23,7 +23,7 @@ class AsyncOutputStreamTest : FunSpec({
     }
 
     test("should emit if written less than buffer size") {
-        val collectedBuffers = outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 5)) {
+        val collectedBuffers = asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 5)) {
             writeAsync {
                 outputStream.writeBytes(1, 2)
             }
@@ -34,7 +34,7 @@ class AsyncOutputStreamTest : FunSpec({
     }
 
     test("should emit if written exactly the buffer size") {
-        val collectedBuffers = outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 5)) {
+        val collectedBuffers = asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 5)) {
             writeAsync {
                 outputStream.writeBytes(1, 2, 3, 4, 5)
             }
@@ -45,7 +45,7 @@ class AsyncOutputStreamTest : FunSpec({
     }
 
     test("should emit if written more than the buffer size") {
-        val collectedBuffers = outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 5)) {
+        val collectedBuffers = asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 5)) {
             writeAsync {
                 outputStream.writeBytes(1, 2, 3, 4, 5, 6)
             }
@@ -57,7 +57,7 @@ class AsyncOutputStreamTest : FunSpec({
     }
 
     test("should support int overload") {
-        val collectedBuffers = outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 5)) {
+        val collectedBuffers = asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 5)) {
             writeAsync {
                 outputStream.write(42)
             }
@@ -69,7 +69,7 @@ class AsyncOutputStreamTest : FunSpec({
 
     test("should prohibit write after close") {
         shouldThrow<IllegalStateException> {
-            outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 5)) {
+            asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 5)) {
                 outputStream.close()
 
                 writeAsync {
@@ -81,7 +81,7 @@ class AsyncOutputStreamTest : FunSpec({
     }
 
     test("should emit if buffer is rolled over multiple times") {
-        val collectedBuffers = outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 2)) {
+        val collectedBuffers = asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 2)) {
             writeAsync {
                 outputStream.writeBytes(1, 2, 3, 4, 5)
             }
@@ -94,7 +94,7 @@ class AsyncOutputStreamTest : FunSpec({
     }
 
     test("should emit if multiple write operations invoked") {
-        val collectedBuffers = outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 2)) {
+        val collectedBuffers = asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 2)) {
             writeAsync {
                 outputStream.writeBytes(1, 2, 3)
             }
@@ -113,7 +113,7 @@ class AsyncOutputStreamTest : FunSpec({
     }
 
     test("should emit with extension function") {
-        val collectedBuffers = outputStreamAsyncProducer(AsyncOutputStreamConfig(emitOnBytes = 5)) {
+        val collectedBuffers = asyncOutputStreamWriter(AsyncOutputStreamConfig(emitOnBytes = 5)) {
             outputStream.testExtension()
         }.toList()
 
@@ -125,6 +125,24 @@ class AsyncOutputStreamTest : FunSpec({
         shouldThrow<IllegalStateException> {
             ByteArrayOutputStream().testExtension()
         }
+    }
+
+    test("should work if stream was manually closed") {
+        val collectedBuffers = asyncOutputStreamWriter {
+            outputStream.writeBytes(1)
+            outputStream.close()
+        }.toList()
+
+        collectedBuffers.shouldHaveSize(1)
+        collectedBuffers[0].shouldHaveData(1)
+    }
+
+    test("should work if stream was manually closed without writing") {
+        val collectedBuffers = asyncOutputStreamWriter {
+            outputStream.close()
+        }.toList()
+
+        collectedBuffers.shouldHaveSize(0)
     }
 })
 
