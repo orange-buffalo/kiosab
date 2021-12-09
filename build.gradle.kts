@@ -1,5 +1,9 @@
 plugins {
     kotlin("jvm") version "1.6.0"
+    id("org.jetbrains.dokka") version "1.6.0"
+    `maven-publish`
+    signing
+    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
 group = "io.orange-buffalo"
@@ -33,5 +37,69 @@ tasks.test {
     useJUnitPlatform()
     testLogging {
         events("passed", "skipped", "failed")
+    }
+}
+
+java {
+    withSourcesJar()
+}
+
+val docsJar = tasks.register<Jar>("docsJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.named("dokkaJavadoc"))
+}
+
+artifacts {
+    archives(docsJar)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("mavenKotlin") {
+            from(components["kotlin"])
+            artifacts {
+                artifact(tasks.named("sourcesJar"))
+                artifact(docsJar)
+            }
+            pom {
+                name.set("kiosab")
+                description.set("Kotlin IO Stream Async Bridge")
+                url.set("https://github.com/orange-buffalo/kiosab")
+                packaging = "jar"
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("orange-buffalo")
+                        name.set("Bogdan Ilchyshyn")
+                        email.set("orange-buffalo@users.noreply.github.com")
+                    }
+                }
+                scm {
+                    connection.set("scm:git@github.com:orange-buffalo/kiosab.git")
+                    developerConnection.set("scm:git@github.com:orange-buffalo/kiosab.git")
+                    url.set("https://github.com/orange-buffalo/kiosab")
+                }
+            }
+        }
+    }
+}
+
+signing {
+    sign(publishing.publications["mavenKotlin"])
+}
+
+nexusPublishing {
+    repositories {
+        create("OSSRH") {
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/staging"))
+            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots"))
+            username.set(project.property("ossrhUser") as String?)
+            password.set(project.property("ossrhPassword") as String?)
+        }
     }
 }
