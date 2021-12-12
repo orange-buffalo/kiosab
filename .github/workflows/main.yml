@@ -5,6 +5,11 @@ on: [push, pull_request]
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    env:
+      ORG_GRADLE_PROJECT_ossrhSigningKey: "${{ secrets.ossrhSigningKey }}"
+      ORG_GRADLE_PROJECT_ossrhSigningPassword: "${{ secrets.ossrhSigningPassword }}"
+      ORG_GRADLE_PROJECT_ossrhPassword: "${{ secrets.ossrhPassword }}"
+      ORG_GRADLE_PROJECT_ossrhUser: "${{ secrets.ossrhUser }}"
 
     steps:
       - name: Checkout
@@ -17,5 +22,9 @@ jobs:
           distribution: temurin
 
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew build --info --console=plain
+
+      - name: Publish
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: ./gradlew publishToOSSRH releaseOSSRHStagingRepository --info --console=plain
 
