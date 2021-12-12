@@ -90,16 +90,21 @@ publishing {
 }
 
 signing {
+    val ossrhSigningKey: String? by project
+    val ossrhSigningPassword: String? by project
+    useInMemoryPgpKeys(ossrhSigningKey, ossrhSigningPassword)
     sign(publishing.publications["mavenKotlin"])
 }
 
 nexusPublishing {
     repositories {
         create("OSSRH") {
+            val ossrhUser: String? by project
+            val ossrhPassword: String? by project
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/staging"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots"))
-            username.set(project.property("ossrhUser") as String?)
-            password.set(project.property("ossrhPassword") as String?)
+            username.set(ossrhUser)
+            password.set(ossrhPassword)
         }
     }
 }
