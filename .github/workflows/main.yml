@@ -26,5 +26,5 @@ jobs:
 
       - name: Publish
         if: ${{ github.ref == 'refs/heads/master' }}
-        run: ./gradlew publishToOSSRH releaseOSSRHStagingRepository --info --console=plain
+        run: ./gradlew publishToOSSRH closeAndReleaseOSSRHStagingRepository --info --console=plain
 
