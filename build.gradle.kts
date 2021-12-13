@@ -4,10 +4,11 @@ plugins {
     `maven-publish`
     signing
     id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("com.github.jmongard.git-semver-plugin") version "0.4.2"
 }
 
 group = "io.orange-buffalo"
-version = "0.1-SNAPSHOT"
+version = semver.version
 
 repositories {
     mavenCentral()
