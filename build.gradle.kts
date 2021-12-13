@@ -102,7 +102,7 @@ nexusPublishing {
         create("OSSRH") {
             val ossrhUser: String? by project
             val ossrhPassword: String? by project
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/staging"))
+            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots"))
             username.set(ossrhUser)
             password.set(ossrhPassword)
