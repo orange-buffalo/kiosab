@@ -25,9 +25,11 @@ jobs:
         run: ./gradlew build --info --console=plain
 
       - name: Release
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: ./gradlew releaseVersion --no-commit --info --console=plain
 
       - name: Push Release
+        if: ${{ github.ref == 'refs/heads/master' }}
         run: git push --tags
 
       - name: Publish
