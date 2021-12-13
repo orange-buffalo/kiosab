@@ -1,6 +1,6 @@
 name: CI
 
-on: [push, pull_request]
+on: [ push, pull_request ]
 
 jobs:
   build-and-release:
@@ -23,18 +23,17 @@ jobs:
           java-version: 11
           distribution: temurin
 
-      - name: Build
-        run: ./gradlew build --info --console=plain
-
       - name: Release
         if: ${{ github.ref == 'refs/heads/master' }}
         run: ./gradlew releaseVersion --no-commit --info --console=plain
 
-      - name: Push Release
-        if: ${{ github.ref == 'refs/heads/master' }}
-        run: git push --tags
+      - name: Build
+        run: ./gradlew build --info --console=plain
 
       - name: Publish
         if: ${{ github.ref == 'refs/heads/master' }}
         run: ./gradlew publishToOSSRH closeAndReleaseOSSRHStagingRepository --info --console=plain
 
+      - name: Push Release
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: git push --tags
